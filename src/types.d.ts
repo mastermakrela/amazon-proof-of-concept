@@ -26,8 +26,8 @@ type UiMessage =
 			type: "button-click" | "increment";
 	  }
 	| {
-			type: "text-message";
-			text: string;
+			type: "image";
+			blob: Uint8Array;
 	  }
 	| {
 			type: "resize";

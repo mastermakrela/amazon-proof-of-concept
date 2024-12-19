@@ -1,8 +1,8 @@
 {
-	"name": "Figma + Svelte Plugin",
+	"name": "Amazon Images",
 	"api": "1.0.0",
 	"main": "code.js",
 	"editorType": ["figma"],
 	"ui": "index.html",
-	"id": "78399040-0360-4cc6-a45a-7891c57a001a"
+	"id": "b9c13ef5-7d6d-4c0f-afa9-5d40371b359a"
 }

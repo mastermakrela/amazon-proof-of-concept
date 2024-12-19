@@ -48,18 +48,28 @@ figma.ui.onmessage = async (msg: UiMessage) => {
 			postMessage({ type: "count", count });
 			break;
 
-		case "text-message":
-			console.log("Message received: text-message in UI");
+		// @bebke: read from here
+		case "image":
+			console.log("[kek] Message received: image in UI");
+			const blob = msg.blob;
+			console.log("[kek] image blob", blob);
 
-			// here we can access the text property and we get the type safety, because it's defined in the `types.d.ts` file
-			text = msg.text;
+			const image = figma.createImage(blob);
+			const img_size = await image.getSizeAsync();
 
-			console.log("saved text", text);
+			const rect = figma.createRectangle();
+			rect.resize(img_size.width, img_size.height);
+
+			rect.fills = [{ type: "IMAGE", imageHash: image.hash, scaleMode: "FILL" }];
+			figma.currentPage.appendChild(rect);
+
+			figma.viewport.scrollAndZoomIntoView([rect]);
+
+			postMessage({ type: "a-thing-happened" });
+
 			break;
 
 		default:
-			// This is a trick to make typescript validate that all cases (message types defined in `types.d.ts`) are handled.
-			const _exhaustiveCheck: never = msg;
-			return _exhaustiveCheck;
+			return msg satisfies never;
 	}
 };

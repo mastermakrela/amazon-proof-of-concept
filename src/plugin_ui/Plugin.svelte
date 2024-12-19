@@ -1,6 +1,4 @@
 <script lang="ts">
-	import Counter from "./Counter.svelte";
-	import { get_random_number } from "$lib";
 	import Resizeable from "./Resizeable.svelte";
 
 	/**
@@ -18,25 +16,27 @@
 		const data = event.data.pluginMessage;
 
 		switch (data.type) {
-			case "count":
-				console.log("count", data.count);
-				count = data.count;
-				break;
 			case "a-thing-happened":
-				console.log("a-thing-happened");
-				data;
+				alert("Image added successfully!");
 				break;
 		}
 	};
 
-	function button_click() {
-		postMessage({ type: "button-click" });
+	async function button_click() {
+		if (!image_url) return;
+
+		const resp = await fetch(image_url);
+		if (!resp.ok) {
+			alert(`Something went wrong\n\n${await resp.text()}`);
+			return;
+		}
+
+		const blob = await resp.blob();
+		console.log(`[kek] 🦔 ~ file: Plugin.svelte:41 ~ button_click ~ blob:`, blob);
+		postMessage({ type: "image", blob: new Uint8Array(await blob.arrayBuffer()) });
 	}
 
-	const initial_count = get_random_number();
-
-	let count = $state(initial_count);
-	let text = $state("");
+	let image_url = $state("https://m.media-amazon.com/images/I/51vSJ9xAQtL._AC_SY879_.jpg");
 </script>
 
 <Resizeable />
@@ -44,39 +44,12 @@
 <main
 	class="prose max-w-none h-full bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center py-8 px-4 text-center"
 >
-	<h1>Figma Plugin Svelte</h1>
+	<h1>Amazon Images</h1>
 
-	<p>
-		Open console (<kbd>⌘</kbd> + <kbd>⌥</kbd> + <kbd>I</kbd> / <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>I</kbd>) to see
-		messages from the plugin.
-	</p>
+	<div class="space-y-4">
+		<input bind:value={image_url} placeholder="Amazon url" />
 
-	<div>
-		<p>This button just sends a message to the plugin.</p>
-		<button onclick={button_click}>Do the thing</button>
-	</div>
-
-	<div>
-		<p>This sends a message to the plugin - to increment the count - and then receives the updated count.</p>
-		<p>
-			count: {count}
-			<br />
-			{#if count === initial_count}
-				<span class="text-sm text-opacity-50">(this is a random starting number, so you can't see it changing)</span>
-			{/if}
-		</p>
-		<button onclick={() => postMessage({ type: "increment" })}>+1</button>
-	</div>
-
-	<div>
-		<p>We can also send text messages to the plugin.</p>
-		<input type="text" oninput={(e) => postMessage({ type: "text-message", text: e.currentTarget.value })} />
-		<p class="text-sm">(you can see the text in the console)</p>
-	</div>
-
-	<div>
-		<p>And of course, we can use <a href="https://svelte.dev" target="_blank">Svelte</a> components!</p>
-		<Counter />
+		<button onclick={button_click}>Get image</button>
 	</div>
 </main>
 
